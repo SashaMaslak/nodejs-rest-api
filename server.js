@@ -5,7 +5,9 @@ require("dotenv").config()
 const { DB_HOST, PORT = 3000 } = process.env
 
 mongoose
-	.connect(DB_HOST)
+	.connect(
+		"mongodb+srv://owmaslak:ngmTj1HRp2WJYeve@cluster0.htdw0fc.mongodb.net/"
+	)
 	.then(() => {
 		console.log("Database connection successful")
 		app.listen(PORT, () => {
