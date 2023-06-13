@@ -4,6 +4,7 @@ const Joi = require("joi")
 
 const { handleMongooseError } = require("../helpers")
 
+// eslint-disable-next-line no-useless-escape
 const emailRegexp = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
 
 const userSchema = new Schema(
@@ -19,6 +20,15 @@ const userSchema = new Schema(
 			type: String,
 			minlength: 6,
 			required: [true, "Set password for user"],
+		},
+		subscription: {
+			type: String,
+			enum: ["starter", "pro", "business"],
+			default: "starter",
+		},
+		token: {
+			type: String,
+			default: "",
 		},
 	},
 	{ versionKey: false, timestamps: true }

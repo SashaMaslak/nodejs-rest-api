@@ -18,8 +18,8 @@ app.use(cors())
 app.use(express.json())
 
 // ENDPOINTS ==============================
-app.use("/api/contacts", contactsRouter)
-app.use("/api/auth", authRouter)
+app.use("/contacts", contactsRouter)
+app.use("/users", authRouter)
 
 // UNKNOWN REQUEST HANDLER =================
 app.all("*", (req, res) => {
