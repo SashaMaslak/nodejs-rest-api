@@ -3,7 +3,25 @@ const { Contact } = require("../models/contact.js")
 const { ctrlWrapper, HttpError } = require("../helpers")
 
 const getAll = async (req, res) => {
-	const result = await Contact.find()
+	const { _id: owner } = req.user
+
+	console.log(req.query.favorite)
+
+	const { page = 1, limit = 25 } = req.query
+	const skip = (page - 1) * limit
+
+	const { favorite } = req.query
+
+	let objForFind = { owner }
+
+	if (favorite) objForFind = { owner, favorite }
+
+	const result = await Contact.find(objForFind, "-createdAt -updateAt", {
+		skip,
+		limit,
+	})
+		.sort({ _id: -1 })
+		.populate("owner", "name email")
 	res.json(result)
 }
 
@@ -15,12 +33,15 @@ const getById = async (req, res) => {
 }
 
 const add = async (req, res) => {
-	const result = await Contact.create(req.body)
+	const { _id: owner } = req.user
+	const result = await Contact.create({ ...req.body, owner })
 	res.status(201).json(result)
 }
 
 const updateById = async (req, res) => {
 	const { contactId } = req.params
+	console.log("req.params-->", req.params)
+
 	const result = await Contact.findByIdAndUpdate(contactId, req.body, {
 		new: true,
 	})
@@ -30,6 +51,7 @@ const updateById = async (req, res) => {
 
 const updateFavorite = async (req, res) => {
 	const { contactId } = req.params
+
 	const result = await Contact.findByIdAndUpdate(contactId, req.body, {
 		new: true,
 	})
