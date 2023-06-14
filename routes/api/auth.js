@@ -17,4 +17,12 @@ router.post("/logout", authenticate, ctrl.logout)
 // CURRENT USER API =====================================
 router.get("/current", authenticate, ctrl.getCurrent)
 
+// UPDATE SUBSCRIPTION API =====================================
+router.patch(
+	"/",
+	authenticate,
+	validateBody(schemas.updateSubSchema),
+	ctrl.updateSubscription
+)
+
 module.exports = router

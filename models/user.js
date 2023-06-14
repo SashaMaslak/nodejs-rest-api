@@ -7,6 +7,11 @@ const { handleMongooseError } = require("../helpers")
 // eslint-disable-next-line no-useless-escape
 const emailRegexp = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
 
+const pswRegexp =
+	/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\\$%\\^&\\*])(?=.{8,128})/
+
+const subList = ["starter", "pro", "business"]
+
 const userSchema = new Schema(
 	{
 		name: { type: String, required: [true, "Set name"] },
@@ -19,11 +24,12 @@ const userSchema = new Schema(
 		password: {
 			type: String,
 			minlength: 6,
+			match: pswRegexp,
 			required: [true, "Set password for user"],
 		},
 		subscription: {
 			type: String,
-			enum: ["starter", "pro", "business"],
+			enum: subList,
 			default: "starter",
 		},
 		token: {
@@ -47,9 +53,16 @@ const loginSchema = Joi.object({
 	password: Joi.string().min(6).required(),
 })
 
+const updateSubSchema = Joi.object({
+	subscription: Joi.string()
+		.valid(...subList)
+		.required(),
+})
+
 const schemas = {
 	registerSchema,
 	loginSchema,
+	updateSubSchema,
 }
 
 const User = model("user", userSchema)
