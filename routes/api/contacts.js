@@ -8,26 +8,26 @@ router.get("/", authenticate, ctrl.getAll)
 router.get("/:contactId", authenticate, isValidId, ctrl.getById)
 
 router.post(
-	"/",
-	authenticate,
-	validateBody(schemas.addSchemaContacts),
-	ctrl.add
+  "/",
+  authenticate,
+  validateBody(schemas.addSchemaContacts),
+  ctrl.add
 )
 
 router.put(
-	"/:contactId",
-	authenticate,
-	isValidId,
-	validateBody(schemas.addSchemaContacts),
-	ctrl.updateById
+  "/:contactId",
+  authenticate,
+  isValidId,
+  validateBody(schemas.addSchemaContacts),
+  ctrl.updateById
 )
 
 router.patch(
-	"/:contactId/favorite",
-	authenticate,
-	isValidId,
-	validateBody(schemas.updateFavoriteSchema),
-	ctrl.updateFavorite
+  "/:contactId/favorite",
+  authenticate,
+  isValidId,
+  validateBody(schemas.updateFavoriteSchema),
+  ctrl.updateFavorite
 )
 
 router.delete("/:contactId", authenticate, isValidId, ctrl.deleteById)
