@@ -1,6 +1,7 @@
 const supertest = require("supertest")
 const app = require("../../app")
 const mongoose = require("mongoose")
+const User = require("../../models/user")
 
 require("dotenv").config()
 const { DB_HOST_TEST } = process.env
@@ -21,5 +22,13 @@ describe("POST /login", () => {
     })
 
     expect(response.statusCode).toBe(200)
+    expect(response.body).toStrictEqual({
+      token: expect.any(String),
+      user: {
+        email: expect.any(String),
+        name: expect.any(String),
+        subscription: expect.any(String),
+      },
+    })
   })
 })
