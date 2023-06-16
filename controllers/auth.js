@@ -1,11 +1,17 @@
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
+const gravatar = require("gravatar")
+const Jimp = require("jimp")
+const path = require("path")
+const fs = require("fs").promises
 require("dotenv").config()
 
 const { User } = require("../models/user.js")
 const { ctrlWrapper, HttpError } = require("../helpers/index.js")
 
 const { SECRET_KEY } = process.env
+
+const avatarsDir = path.join(__dirname, "../", "public", "avatars")
 
 const register = async (req, res) => {
   const { email, password } = req.body
@@ -16,8 +22,13 @@ const register = async (req, res) => {
   }
 
   const hashPassword = await bcrypt.hash(password, 10)
+  const avatarURL = gravatar.url(email)
 
-  const newUser = await User.create({ ...req.body, password: hashPassword })
+  const newUser = await User.create({
+    ...req.body,
+    password: hashPassword,
+    avatarURL,
+  })
   res.status(201).json({
     user: {
       name: newUser.name,
@@ -80,10 +91,39 @@ const updateSubscription = async (req, res) => {
   res.json(result)
 }
 
+const updateAvatar = async (req, res) => {
+  const { _id } = req.user
+  const { path: tmpUpload, originalname } = req.file
+
+  const image = await Jimp.read(tmpUpload)
+  image.resize(250, 250)
+  image.write(tmpUpload)
+
+  const filename = `${_id}_${originalname}`
+  const resultUpload = path.join(avatarsDir, filename)
+
+  await fs.rename(tmpUpload, resultUpload)
+  const avatarURL = path.join("avatars", filename)
+
+  const result = await User.findByIdAndUpdate(
+    _id,
+    { avatarURL },
+    {
+      new: true,
+    }
+  )
+
+  if (!result) {
+    throw HttpError(404, "Not found")
+  }
+  res.json({ avatarURL })
+}
+
 module.exports = {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
   logout: ctrlWrapper(logout),
   getCurrent: ctrlWrapper(getCurrent),
   updateSubscription: ctrlWrapper(updateSubscription),
+  updateAvatar: ctrlWrapper(updateAvatar),
 }
