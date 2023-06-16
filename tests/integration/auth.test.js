@@ -16,10 +16,6 @@ describe("POST /login", () => {
     await mongoose.disconnect()
   })
 
-  // beforeEach(async () => {
-  //   await User.deleteMany()
-  // })
-
   it("should register user", async () => {
     const response = await supertest(app).post("/users/register").send({
       name: "testUser2",
@@ -35,6 +31,22 @@ describe("POST /login", () => {
         subscription: expect.any(String),
       },
     })
+  })
+
+  it("can not register 2 users with the same email", async () => {
+    const email = "testUser2@gmail.com"
+    await supertest(app).post("/users/register").send({
+      email: "testUser2@gmail.com",
+      password: "123456",
+    })
+
+    const response = await supertest(app).post("/users/register").send({
+      email,
+      name: "testUser2",
+      password: "123456",
+    })
+
+    expect(response.statusCode).toBe(409)
   })
 
   it("should login user", async () => {
